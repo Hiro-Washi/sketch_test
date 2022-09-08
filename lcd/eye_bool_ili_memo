@@ -1,0 +1,92 @@
+ 
+#include <stdlib.h>
+#include <time.h>
+#include <ros.h>
+#include <std_msgs/String.h>
+#include <std_msgs/Bool.h>
+//#include "LCDWIKI_GUI.h"
+#include "LCDWIKI_SPI.h" //  IDEバージョンが1.00以上の場合
+#define MODEL ILI9488_18
+#define CS   10
+#define CD   9
+#define RST  8
+#define LED  -1             // to declare unused (set to 3.3V)
+LCDWIKI_SPI lcd(MODEL, CS, CD, RST, LED);
+#define BLACK               0x0000      /*   0,   0,   0 */
+//#define NAVY                0x000F      /*   0,   0, 128 */
+//#define DARKGREEN           0x03E0      /*   0, 128,   0 */
+//#define DARKCYAN            0x03EF      /*   0, 128, 128 */
+//#define MAROON              0x7800      /* 128,   0,   0 */
+//#define PURPLE              0x780F      /* 128,   0, 128 */
+//#define OLIVE               0x7BE0      /* 128, 128,   0 */
+//#define LIGHTGREY           0xC618      /* 192, 192, 192 */
+//#define DARKGREY            0x7BEF      /* 128, 128, 128 */
+#define BLUE                0x001F      /*   0,   0, 255 */
+#define GREEN               0x07E0      /*   0, 255,   0 */
+#define CYAN                0x07FF      /*   0, 255, 255 */
+#define RED                 0xF800      /* 255,   0,   0 */
+//#define MAGENTA             0xF81F      /* 255,   0, 255 */
+#define YELLOW              0xFFE0      /* 255, 255,   0 */
+#define WHITE               0xFFFF      /* 255, 255, 255 */
+#define ORANGE              0xFD20      /* 255, 165,   0 */
+//#define GREENYELLOW         0xAFE5      /* 173, 255,  47 */
+//#define PINK                0xF81F
+uint16_t wW, hH;
+uint16_t NUM = 0;
+//char success[20] = "recieved a message",failure[20] = "missed a message";
+ros::NodeHandle nh;
+//#define ROS_INFO
+//std_msgs::String chat;
+//ros::Publisher res_pub("eye_res", &chat);
+void eyeRightCallback(const std_msgs::Bool& msg){
+    //res_pub.publish(&chat);
+    nh.loginfo("msg.data");
+    if (msg.data/* == True*/){
+        // SECCESS
+        // chat.data = success;
+        
+    } else {
+        // FALSE
+        // chat.data = failure;
+        
+    }
+    //pyb.publish(&chat);
+}
+ros::Subscriber<std_msgs::Bool> eye_sub("eye_bool_right",&eyeRightCallback);
+void setup(){
+    nh.initNode();
+    nh.subscribe(eye_sub);
+    //nh.advertise(res_pub);
+    wW = lcd.Get_Display_Height();
+    hH = lcd.Get_Display_Width();
+    Serial.print("*** TFT-LCD ");
+    Serial.print(wW + "x" + hH);
+    lcd.Init_LCD();
+    lcd.Fill_Screen(0x0);
+}
+void loop(){
+//wink
+  
+  lcd.Fill_Screen(BLACK);
+  lcd.Set_Text_colour(WHITE);
+  lcd.Set_Text_Back_colour(CYAN);
+  lcd.Set_Text_Size(2);
+  lcd.Print_String("( o )", CENTER, 0);
+  delay(500);
+  lcd.Fill_Circle(wW / 2, hH / 2, 2);
+  delay(2000);
+  
+}
+void successEye(){
+  // Yellow or Orrange (^ ^) for( 5sec )
+  //lcd.Rotate(90); lcd.Set_Text_Size(-); print(")"); lcd.Fill_Screen(0x0);
+}
+void falseEye(){
+  //red, (X X), for(until(!ros.available))
+
+  // 白目
+  //lcd.Fill_Circle(0,0,0);
+}
+void wink(float ms){
+  // 1wink
+}
